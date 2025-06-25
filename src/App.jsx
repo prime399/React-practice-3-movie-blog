@@ -28,6 +28,26 @@ function App() {
     handleStars();
   }, [selectedMovie]);
 
+  useEffect(() => {
+    async function getMovies() {
+      try {
+        const response = await fetch(url, options);
+        const data = await response.json();
+
+        if (data && data.results) {
+          console.log(data.results);
+          setMovies(data.results);
+        } else {
+          console.error("APi failed");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    getMovies();
+  }, []);
+
   function handleRunTime() {
     let runtime = selectedMovie.reduce(
       (total, currentmovie) => total + currentmovie.runtime,
@@ -79,29 +99,9 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    async function getMovies() {
-      try {
-        const response = await fetch(url, options);
-        const data = await response.json();
-
-        if (data && data.results) {
-          console.log(data.results);
-          setMovies(data.results);
-        } else {
-          console.error("APi failed");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    getMovies();
-  }, []);
-
   return (
     <div className="bg-slate-900 w-full min-h-screen">
-      <Navbar />
+      <Navbar moviesNumber={movies.length} />
       <section className="flex">
         <MovieList movies={movies} onAddWatchedMovie={handleSelectedMovie} />
         <WatchedList

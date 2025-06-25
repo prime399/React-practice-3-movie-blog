@@ -1,6 +1,6 @@
 import popcorn_icon from "../assets/popcorn-icon.png";
 
-function NavBar() {
+function NavBar({ moviesNumber }) {
   return (
     <>
       <div className="w-full bg-purple-900 h-9 flex justify-center items-center text-white font-semibold ">
@@ -23,7 +23,7 @@ function NavBar() {
           />
         </div>
         <div className="mx-2 mr-3">
-          Found <span className="font-bold">3</span> results
+          Found <span className="font-bold">{moviesNumber}</span> results
         </div>
       </div>
     </>

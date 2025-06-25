@@ -19,10 +19,12 @@ function MovieCard({ movie, i, onAddWatchedMovie, WatchedList }) {
         <h3 className="text-white font-semibold pr-4">
           {movie.original_title}
         </h3>
-
-        <p className="text-yellow-100 mt-6">
-          {movie.vote_average.toFixed(1)}/10
-        </p>
+        <div className="flex items-center mt-6">
+          <span className="text-yellow-100">
+            {movie.vote_average.toFixed(1)}/10
+          </span>
+          <span className="text-white ml-2">{movie.runtime} min</span>
+        </div>
       </div>
       {!WatchedList && (
         <button
