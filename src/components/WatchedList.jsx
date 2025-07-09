@@ -1,12 +1,7 @@
 import MovieCard from "./MovieCard";
+import StarRating from "./StarRating";
 
-function WatchedList({
-  selectedMovie,
-  runtime,
-  stars,
-  toggle,
-  onHandleToggle,
-}) {
+function WatchedList({ selectedMovie, runtime, toggle, onHandleToggle }) {
   return (
     <div className="bg-slate-600 w-1/2 h-full rounded-2xl m-6 mt-10 relative">
       <div className="bg-slate-500 h-6 text-white font-semibold ">
@@ -24,7 +19,7 @@ function WatchedList({
             <div className="text-white font-thin">
               🎥 {selectedMovie?.length} Movies
             </div>
-            <div className="text-white font-thin">⭐ {stars.toFixed(1)}</div>
+            <StarRating maxRating={10} />
             <div className="text-white font-thin">⌛ {runtime} min</div>
           </div>
           {selectedMovie &&
