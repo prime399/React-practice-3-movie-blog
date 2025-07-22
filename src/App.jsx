@@ -3,9 +3,17 @@ import Navbar from "./components/Navbar";
 import MovieList from "./components/MovieList";
 import { useEffect } from "react";
 import WatchedList from "./components/WatchedList";
+import Loader from "./components/Loader";
+import ErrorMessageComp from "./components/ErrorMessage";
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [selectedMovie, setSelectedMovie] = useState([]);
+  const [runtime, setRunTime] = useState(0);
+  const [stars, setStars] = useState(0);
+  const [toggle, setToggle] = useState(true);
+  const [isLoading, setisLoading] = useState(false);
+  const [ErrorMessage, setErrorMessage] = useState("");
 
   const url =
     "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc";
@@ -18,11 +26,6 @@ function App() {
     },
   };
 
-  const [selectedMovie, setSelectedMovie] = useState([]);
-  const [runtime, setRunTime] = useState(0);
-  const [stars, setStars] = useState(0);
-  const [toggle, setToggle] = useState(true);
-
   useEffect(() => {
     handleRunTime();
     handleStars();
@@ -30,6 +33,7 @@ function App() {
 
   useEffect(() => {
     async function getMovies() {
+      setisLoading(true);
       try {
         const response = await fetch(url, options);
         const data = await response.json();
@@ -42,6 +46,9 @@ function App() {
         }
       } catch (error) {
         console.error(error);
+        setErrorMessage(error.message);
+      } finally {
+        setisLoading(false);
       }
     }
 
@@ -91,11 +98,11 @@ function App() {
         });
       } else {
         console.log(`Url:-${WatchedMovieUrl} `);
-
-        console.error("Movie Data Retrieval Failed somehow!");
+        throw new Error("Movie Data Retrieval Failed somehow!");
       }
     } catch (err) {
       console.error(err);
+      setErrorMessage(err.message);
     }
   }
 
@@ -103,7 +110,14 @@ function App() {
     <div className="bg-slate-900 w-full min-h-screen">
       <Navbar moviesNumber={movies.length} />
       <section className="flex">
-        <MovieList movies={movies} onAddWatchedMovie={handleSelectedMovie} />
+        {!isLoading && !ErrorMessage && (
+          <MovieList movies={movies} onAddWatchedMovie={handleSelectedMovie} />
+        )}
+
+        {isLoading && <Loader />}
+
+        {ErrorMessage && <ErrorMessageComp ErrorMessage={ErrorMessage} />}
+
         <WatchedList
           selectedMovie={selectedMovie}
           runtime={runtime}
