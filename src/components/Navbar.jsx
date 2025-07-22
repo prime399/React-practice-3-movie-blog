@@ -1,6 +1,6 @@
 import popcorn_icon from "../assets/popcorn-icon.png";
 
-function NavBar({ moviesNumber }) {
+function NavBar({ moviesNumber, searchQuery, setSearchQuery }) {
   return (
     <>
       <div className="w-full bg-purple-900 h-9 flex justify-center items-center text-white font-semibold ">
@@ -20,6 +20,8 @@ function NavBar({ moviesNumber }) {
             id=""
             className="bg-purple-800 text-white rounded-md text-center"
             placeholder="Search movies..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <div className="mx-2 mr-3">

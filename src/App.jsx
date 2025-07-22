@@ -14,27 +14,27 @@ function App() {
   const [toggle, setToggle] = useState(true);
   const [isLoading, setisLoading] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState("");
-
-  const url =
-    "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc";
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZTk1YmIyODkzMWQ5YmY3ODlmYzU4OGNkY2ViMTYzMSIsIm5iZiI6MTU4NTEyNjQ3Ni40ODEsInN1YiI6IjVlN2IxYzRjOWU0MDEyMDAxNTA0YTlmOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.EpJ2vliFBmRpdbWklIm8LToMEGJJg2PG4g_dP6T56YA",
-    },
-  };
+  const [query, setQuery] = useState("test");
 
   useEffect(() => {
-    handleRunTime();
-    handleStars();
+    handleRunTime(selectedMovie);
+    handleStars(selectedMovie);
   }, [selectedMovie]);
 
   useEffect(() => {
     async function getMovies() {
       setisLoading(true);
+      setErrorMessage("");
       try {
+        const url = `https://api.themoviedb.org/3/search/movie?query=${query}&include_adult=false&language=en-US&page=1`;
+        const options = {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZTk1YmIyODkzMWQ5YmY3ODlmYzU4OGNkY2ViMTYzMSIsIm5iZiI6MTU4NTEyNjQ3Ni40ODEsInN1YiI6IjVlN2IxYzRjOWU0MDEyMDAxNTA0YTlmOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.EpJ2vliFBmRpdbWklIm8LToMEGJJg2PG4g_dP6T56YA",
+          },
+        };
         const response = await fetch(url, options);
         const data = await response.json();
 
@@ -53,9 +53,23 @@ function App() {
     }
 
     getMovies();
-  }, []);
+  }, [query]);
 
-  function handleRunTime() {
+  useEffect(() => {
+    if (selectedMovie.length > 0) {
+      document.title = `Movie | ${
+        selectedMovie[selectedMovie.length - 1]?.title
+      }`;
+    } else {
+      document.title = "Movie";
+    }
+
+    return () => {
+      document.title = "UsePopCorn";
+    };
+  }, [selectedMovie]);
+
+  function handleRunTime(selectedMovie) {
     let runtime = selectedMovie.reduce(
       (total, currentmovie) => total + currentmovie.runtime,
       0
@@ -63,7 +77,7 @@ function App() {
     setRunTime(runtime);
   }
 
-  function handleStars() {
+  function handleStars(selectedMovie) {
     let stars = selectedMovie.reduce(
       (totalStars, currentmovieStars) =>
         totalStars + currentmovieStars.vote_average,
@@ -78,6 +92,14 @@ function App() {
 
   async function handleSelectedMovie(movieWatched) {
     try {
+      const options = {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          Authorization:
+            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZTk1YmIyODkzMWQ5YmY3ODlmYzU4OGNkY2ViMTYzMSIsIm5iZiI6MTU4NTEyNjQ3Ni40ODEsInN1YiI6IjVlN2IxYzRjOWU0MDEyMDAxNTA0YTlmOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.EpJ2vliFBmRpdbWklIm8LToMEGJJg2PG4g_dP6T56YA",
+        },
+      };
       const WatchedMovieUrl = `https://api.themoviedb.org/3/movie/${movieWatched?.id}?language=en-US`;
       const response = await fetch(WatchedMovieUrl, options);
       const movieData = await response.json();
@@ -108,7 +130,11 @@ function App() {
 
   return (
     <div className="bg-slate-900 w-full min-h-screen">
-      <Navbar moviesNumber={movies.length} />
+      <Navbar
+        moviesNumber={movies.length}
+        searchQuery={query}
+        setSearchQuery={setQuery}
+      />
       <section className="flex">
         {!isLoading && !ErrorMessage && (
           <MovieList movies={movies} onAddWatchedMovie={handleSelectedMovie} />
