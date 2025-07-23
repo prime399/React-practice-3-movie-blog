@@ -1,7 +1,13 @@
 import MovieCard from "./MovieCard";
 import StarRating from "./StarRating";
 
-function WatchedList({ selectedMovie, runtime, toggle, onHandleToggle }) {
+function WatchedList({
+  selectedMovie,
+  runtime,
+  toggle,
+  onHandleToggle,
+  onHandleRemoveMovie,
+}) {
   return (
     <div className="bg-slate-600 w-1/2 h-full rounded-2xl m-6 mt-10 relative">
       <div className="bg-slate-500 h-6 text-white font-semibold ">
@@ -24,7 +30,12 @@ function WatchedList({ selectedMovie, runtime, toggle, onHandleToggle }) {
           </div>
           {selectedMovie &&
             selectedMovie.map((movie, i) => (
-              <MovieCard movie={movie} key={i} WatchedList={true} />
+              <MovieCard
+                movie={movie}
+                key={i}
+                WatchedList={true}
+                onHandleRemoveMovie={onHandleRemoveMovie}
+              />
             ))}
         </section>
       )}

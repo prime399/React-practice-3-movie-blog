@@ -1,6 +1,12 @@
 import WatchedList from "./WatchedList";
 
-function MovieCard({ movie, i, onAddWatchedMovie, WatchedList }) {
+function MovieCard({
+  movie,
+  i,
+  onAddWatchedMovie,
+  WatchedList,
+  onHandleRemoveMovie,
+}) {
   const baseUrl = "https://image.tmdb.org/t/p/";
   const size = "w500";
   const imgUrl = `${baseUrl}${size}${movie.poster_path}`;
@@ -26,7 +32,14 @@ function MovieCard({ movie, i, onAddWatchedMovie, WatchedList }) {
           <span className="text-white ml-2">{movie.runtime} min</span>
         </div>
       </div>
-      {!WatchedList && (
+      {WatchedList ? (
+        <button
+          onClick={() => onHandleRemoveMovie(movie)}
+          className="absolute right-4 top-1/2 -translate-y-1/2"
+        >
+          &#128465;
+        </button>
+      ) : (
         <button
           onClick={() => onAddWatchedMovie(movie)}
           className="font-bold text-white text-2xl absolute right-4 top-1/2 -translate-y-1/2"

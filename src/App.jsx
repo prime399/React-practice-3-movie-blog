@@ -22,6 +22,8 @@ function App() {
   }, [selectedMovie]);
 
   useEffect(() => {
+    const Controller = new AbortController();
+
     async function getMovies() {
       setisLoading(true);
       setErrorMessage("");
@@ -34,6 +36,7 @@ function App() {
             Authorization:
               "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZTk1YmIyODkzMWQ5YmY3ODlmYzU4OGNkY2ViMTYzMSIsIm5iZiI6MTU4NTEyNjQ3Ni40ODEsInN1YiI6IjVlN2IxYzRjOWU0MDEyMDAxNTA0YTlmOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.EpJ2vliFBmRpdbWklIm8LToMEGJJg2PG4g_dP6T56YA",
           },
+          signal: Controller.signal,
         };
         const response = await fetch(url, options);
         const data = await response.json();
@@ -46,19 +49,23 @@ function App() {
         }
       } catch (error) {
         console.error(error);
-        setErrorMessage(error.message);
+        if (error.name !== "AbortError") setErrorMessage(error.message);
       } finally {
         setisLoading(false);
       }
     }
 
     getMovies();
+
+    return function () {
+      Controller.abort();
+    };
   }, [query]);
 
   useEffect(() => {
     if (selectedMovie.length > 0) {
       document.title = `Movie | ${
-        selectedMovie[selectedMovie.length - 1]?.title
+        selectedMovie[selectedMovie.length - 1].title
       }`;
     } else {
       document.title = "Movie";
@@ -69,21 +76,38 @@ function App() {
     };
   }, [selectedMovie]);
 
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.code === "Escape") {
+        setSelectedMovie((prevMovies) =>
+          prevMovies.length > 1 ? prevMovies.slice(0, -1) : []
+        );
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   function handleRunTime(selectedMovie) {
-    let runtime = selectedMovie.reduce(
-      (total, currentmovie) => total + currentmovie.runtime,
-      0
-    );
-    setRunTime(runtime);
+    if (selectedMovie) {
+      let runtime = selectedMovie.reduce(
+        (total, currentmovie) => total + currentmovie.runtime,
+        0
+      );
+      setRunTime(runtime);
+    }
   }
 
   function handleStars(selectedMovie) {
-    let stars = selectedMovie.reduce(
-      (totalStars, currentmovieStars) =>
-        totalStars + currentmovieStars.vote_average,
-      0
-    );
-    setStars(stars);
+    if (selectedMovie) {
+      let stars = selectedMovie.reduce(
+        (totalStars, currentmovieStars) =>
+          totalStars + currentmovieStars.vote_average,
+        0
+      );
+      setStars(stars);
+    }
   }
 
   function handleToggle() {
@@ -128,6 +152,12 @@ function App() {
     }
   }
 
+  function handleRemoveWatchedMovie(movieToRemove) {
+    setSelectedMovie((movieWatchedList) => {
+      return movieWatchedList.filter((m) => m.id !== movieToRemove.id);
+    });
+  }
+
   return (
     <div className="bg-slate-900 w-full min-h-screen">
       <Navbar
@@ -150,6 +180,7 @@ function App() {
           stars={stars}
           toggle={toggle}
           onHandleToggle={handleToggle}
+          onHandleRemoveMovie={handleRemoveWatchedMovie}
         />
       </section>
     </div>
