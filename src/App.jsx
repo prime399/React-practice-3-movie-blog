@@ -12,9 +12,9 @@ function App() {
   const [runtime, setRunTime] = useState(0);
   const [stars, setStars] = useState(0);
   const [toggle, setToggle] = useState(true);
-  const [isLoading, setisLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState("");
-  const [query, setQuery] = useState("test");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     handleRunTime(selectedMovie);
@@ -25,16 +25,17 @@ function App() {
     const Controller = new AbortController();
 
     async function getMovies() {
-      setisLoading(true);
+      setIsLoading(true);
       setErrorMessage("");
       try {
-        const url = `https://api.themoviedb.org/3/search/movie?query=${query}&include_adult=false&language=en-US&page=1`;
+        const url = `${
+          import.meta.env.VITE_TMDB_BASE_URL
+        }/search/movie?query=${query}&include_adult=false&language=en-US&page=1`;
         const options = {
           method: "GET",
           headers: {
             accept: "application/json",
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZTk1YmIyODkzMWQ5YmY3ODlmYzU4OGNkY2ViMTYzMSIsIm5iZiI6MTU4NTEyNjQ3Ni40ODEsInN1YiI6IjVlN2IxYzRjOWU0MDEyMDAxNTA0YTlmOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.EpJ2vliFBmRpdbWklIm8LToMEGJJg2PG4g_dP6T56YA",
+            Authorization: `Bearer ${import.meta.env.VITE_TMDB_API_KEY}`,
           },
           signal: Controller.signal,
         };
@@ -51,7 +52,7 @@ function App() {
         console.error(error);
         if (error.name !== "AbortError") setErrorMessage(error.message);
       } finally {
-        setisLoading(false);
+        setIsLoading(false);
       }
     }
 
@@ -120,11 +121,12 @@ function App() {
         method: "GET",
         headers: {
           accept: "application/json",
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkZTk1YmIyODkzMWQ5YmY3ODlmYzU4OGNkY2ViMTYzMSIsIm5iZiI6MTU4NTEyNjQ3Ni40ODEsInN1YiI6IjVlN2IxYzRjOWU0MDEyMDAxNTA0YTlmOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.EpJ2vliFBmRpdbWklIm8LToMEGJJg2PG4g_dP6T56YA",
+          Authorization: `Bearer ${import.meta.env.VITE_TMDB_API_KEY}`,
         },
       };
-      const WatchedMovieUrl = `https://api.themoviedb.org/3/movie/${movieWatched?.id}?language=en-US`;
+      const WatchedMovieUrl = `${import.meta.env.VITE_TMDB_BASE_URL}/movie/${
+        movieWatched?.id
+      }?language=en-US`;
       const response = await fetch(WatchedMovieUrl, options);
       const movieData = await response.json();
 
