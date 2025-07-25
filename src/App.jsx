@@ -8,13 +8,21 @@ import ErrorMessageComp from "./components/ErrorMessage";
 
 function App() {
   const [movies, setMovies] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState([]);
+  // const [selectedMovie, setSelectedMovie] = useState([]);
   const [runtime, setRunTime] = useState(0);
   const [stars, setStars] = useState(0);
   const [toggle, setToggle] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState("");
   const [query, setQuery] = useState("");
+  const [selectedMovie, setSelectedMovie] = useState(() => {
+    const storedValue = localStorage.getItem("watched");
+    if (storedValue) {
+      return JSON.parse(storedValue);
+    } else {
+      return [];
+    }
+  });
 
   useEffect(() => {
     handleRunTime(selectedMovie);
@@ -64,7 +72,7 @@ function App() {
   }, [query]);
 
   useEffect(() => {
-    if (selectedMovie.length > 0) {
+    if (selectedMovie && selectedMovie.length > 0) {
       document.title = `Movie | ${
         selectedMovie[selectedMovie.length - 1].title
       }`;
@@ -89,6 +97,11 @@ function App() {
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("watched", JSON.stringify(selectedMovie));
+    // return () => {};
+  }, [selectedMovie]);
 
   function handleRunTime(selectedMovie) {
     if (selectedMovie) {
