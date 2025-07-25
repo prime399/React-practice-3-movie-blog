@@ -30,7 +30,7 @@ function App() {
       try {
         const url = `${
           import.meta.env.VITE_TMDB_BASE_URL
-        }/search/movie?query=${query}&include_adult=false&language=en-US&page=1`;
+        }/search/movie?query=${query}&include_adult=false&language=en-US&`;
         const options = {
           method: "GET",
           headers: {
