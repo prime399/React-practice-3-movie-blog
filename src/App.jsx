@@ -5,71 +5,25 @@ import { useEffect } from "react";
 import WatchedList from "./components/WatchedList";
 import Loader from "./components/Loader";
 import ErrorMessageComp from "./components/ErrorMessage";
+import { useMovies } from "./useMovies";
+import { useLocalStorageState } from "./useLocalStorageState";
 
 function App() {
-  const [movies, setMovies] = useState([]);
   // const [selectedMovie, setSelectedMovie] = useState([]);
   const [runtime, setRunTime] = useState(0);
   const [stars, setStars] = useState(0);
   const [toggle, setToggle] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState("");
   const [query, setQuery] = useState("");
-  const [selectedMovie, setSelectedMovie] = useState(() => {
-    const storedValue = localStorage.getItem("watched");
-    if (storedValue) {
-      return JSON.parse(storedValue);
-    } else {
-      return [];
-    }
-  });
+
+  //Custom Hooks Practise
+  const [selectedMovie, setSelectedMovie] = useLocalStorageState([], "watched");
+  const [isLoading, movies] = useMovies(query);
 
   useEffect(() => {
     handleRunTime(selectedMovie);
     handleStars(selectedMovie);
   }, [selectedMovie]);
-
-  useEffect(() => {
-    const Controller = new AbortController();
-
-    async function getMovies() {
-      setIsLoading(true);
-      setErrorMessage("");
-      try {
-        const url = `${
-          import.meta.env.VITE_TMDB_BASE_URL
-        }/search/movie?query=${query}&include_adult=false&language=en-US&page=1`;
-        const options = {
-          method: "GET",
-          headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_TMDB_API_KEY}`,
-          },
-          signal: Controller.signal,
-        };
-        const response = await fetch(url, options);
-        const data = await response.json();
-
-        if (data && data.results) {
-          console.log(data.results);
-          setMovies(data.results);
-        } else {
-          console.error("APi failed");
-        }
-      } catch (error) {
-        console.error(error);
-        if (error.name !== "AbortError") setErrorMessage(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    getMovies();
-
-    return function () {
-      Controller.abort();
-    };
-  }, [query]);
 
   useEffect(() => {
     if (selectedMovie && selectedMovie.length > 0) {
@@ -96,12 +50,7 @@ function App() {
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("watched", JSON.stringify(selectedMovie));
-    // return () => {};
-  }, [selectedMovie]);
+  }, [setSelectedMovie]);
 
   function handleRunTime(selectedMovie) {
     if (selectedMovie) {

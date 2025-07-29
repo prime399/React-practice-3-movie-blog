@@ -1,6 +1,23 @@
+import { useEffect, useRef } from "react";
 import popcorn_icon from "../assets/popcorn-icon.png";
 
 function NavBar({ moviesNumber, searchQuery, setSearchQuery }) {
+  const InputElement = useRef(null);
+
+  useEffect(() => {
+    function cb(e) {
+      if (e.code === "Enter") {
+        InputElement.current.focus();
+        setSearchQuery("");
+      }
+    }
+
+    document.addEventListener("keydown", cb);
+    return () => {
+      document.addEventListener("keydown", cb);
+    };
+  }, [setSearchQuery]);
+
   return (
     <>
       <div className="w-full bg-purple-900 h-9 flex justify-center items-center text-white font-semibold ">
@@ -16,12 +33,11 @@ function NavBar({ moviesNumber, searchQuery, setSearchQuery }) {
         <div className="mx-2">
           <input
             type="text"
-            name=""
-            id=""
             className="bg-purple-800 text-white rounded-md text-center"
             placeholder="Search movies..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            ref={InputElement}
           />
         </div>
         <div className="mx-2 mr-3">
